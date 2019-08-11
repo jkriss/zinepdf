@@ -1,6 +1,23 @@
+#!/usr/bin/python
+
+# This script takes a 7 or 8 page legal size pdf and makes a one-page foldable zine
+
 from PyPDF2 import PdfFileWriter, PdfFileReader
+import sys
+
+if len(sys.argv) < 2:
+    print('Usage: zinepdf.py <inputFile> (<outputFile>)')
+    quit()
+
+inputFile = sys.argv[1]
+
+print('Opening %s' % inputFile)
+input = PdfFileReader(open(inputFile, "rb"))
+
 output = PdfFileWriter()
-input = PdfFileReader(open("/home/pi/Downloads/XIN-2019-08.pdf", "rb"))
+outputFile = "zine.pdf"
+if len(sys.argv) > 2:
+    outputFile = sys.argv[2]    
 
 pageCount = input.getNumPages()
 
@@ -11,6 +28,7 @@ pw = 11*72
 
 # each page should be 2.75 x 4.25
 # scaled up to roughly 8.5 x 11, that's 8.5 x 13.13 (just shy of legal size)
+# see http://experimentwithnature.com/02-found/experiment-with-paper-how-to-make-a-one-page-zine/attachment/content-1/
 
 zine.mergeRotatedScaledTranslatedPage(input.getPage(1), 180, scale, pw, ph)
 zine.mergeRotatedScaledTranslatedPage(input.getPage(2), 180, scale, 3*pw/4, ph)
@@ -24,5 +42,6 @@ if pageCount > 7:
     zine.mergeRotatedScaledTranslatedPage(input.getPage(7), 0, scale, 2*pw/4, 0)
 
 # write to zine.pdf
-outputStream = open("zine.pdf", "wb")
+print('Writing to %s' % outputFile)
+outputStream = open(outputFile, "wb")
 output.write(outputStream)
